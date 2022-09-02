@@ -1,0 +1,60 @@
+version: '3'
+services:
+     mariadb:
+        build:
+           context: requirements/mariadb
+           dockerfile: Dockerfile
+        image: mariadb
+        container_name: mariadb
+        restart: always
+        env_file:
+              - .env
+        networks:
+             - wp
+        volumes:
+             - MDB:/var/lib/mysql
+     wordpress:
+        build:
+           context: requirements/wordpress
+           dockerfile: Dockerfile
+        image: wordpress
+        container_name: wordpress
+        restart: always
+        volumes:
+               - wordpress:/var/www/html/wp
+        networks:
+               - wp
+        depends_on:
+               - mariadb
+        env_file:
+               - .env
+     ngnix:
+        build:
+           context: requirements/ngnix
+           dockerfile: Dockerfile
+        image: ngnix
+        container_name: ngnix
+        ports: 
+               - "443:443"
+        volumes:
+               - wordpress:/var/www/html/wp
+        restart: always
+        networks:
+               - wp
+        env_file:
+               - .env
+networks:
+    wp:
+        driver: bridge
+
+volumes:
+       wordpress:
+              driver_opts:
+                     type: none
+                     device: /home/aaqari/data/wordpress/wp
+                     o: bind
+       MDB:
+              driver_opts:
+                     type: none
+                     device: /home/aaqari/data/db
+                     o: bind

@@ -1,0 +1,24 @@
+server {
+    #autoindex on
+    listen 443 ssl;
+    listen [::]:443 ssl;
+
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_certificate /cert/ssl_certificat.crt;
+    ssl_certificate_key /cert/ssl_certificat.key;
+
+    root /var/www/html/wp;
+    index index.php index.html index.htm index.nginx-debian.html;
+
+    server_name localhost;
+    location / {
+        #autoindex on;
+        #autoindex_exact_size on;
+        try_files $uri $uri/ =404;
+    }
+
+    location ~ \.php$ {
+        include snippets/fastcgi-php.conf;
+        fastcgi_pass wordpress:9000;
+    }
+}
